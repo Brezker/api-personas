@@ -1,19 +1,9 @@
-import { resolve } from 'path';
-import { personas } from '../configs/data-source';
 import { pool } from '../index'
 
 export async function obtenerPersonas() {
   const result = await pool.query('SELECT * FROM personas ORDER BY id');
   return result.rows;
 }
-
-// export async function obtenerPersonas(): Promise<typeof personas> {
-//     return new Promise((resolve)=>{
-//         setTimeout(()=>{
-//             resolve(personas);
-//         }, 1000);
-//     });
-// }
 
 export async function obtenerPersonaPorId(id: number) {
     const result = await pool.query('SELECT * FROM personas WHERE id = $1', [id]);

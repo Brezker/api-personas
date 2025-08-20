@@ -1,6 +1,5 @@
 import { Request, Response } from 'express';
 import { crearPersona, deletePerson, editPerson, obtenerPersonaPorId, obtenerPersonas } from '../controllers/peopleController';
-import { personas } from '../configs/data-source';
 import { Router } from 'express';
 
 const router = Router();

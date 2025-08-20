@@ -1,24 +1,23 @@
-import { promises } from 'dns';
 import express, { Request, Response } from 'express';
 import rootRouter from './routers/rootRouter';
-import { resolve } from 'path';
 import { Pool } from 'pg';
+import dotenv from 'dotenv';
 
+dotenv.config();
 const app = express();
 const PORT = 3000;
 export const pool = new Pool({
-  user: 'postgres',
-  host: 'localhost',
-  database: 'persona',
-  password: 'root',
-  port: 5432,
+  user: process.env.DB_USER,
+  host: process.env.DB_HOST,
+  database: process.env.DB_NAME,
+  password: process.env.DB_PASSWORD,
+  port: Number(process.env.DB_PORT),
 });
 
 app.use(express.json());
 
 app.use('/api', rootRouter);
 
-// Iniciar el servidor
 app.listen(PORT, () => {
   console.log(`🚀 Servidor corriendo en http://localhost:${PORT}`);
 });
@@ -30,24 +29,3 @@ pool.connect()
   .catch((err) => {
     console.error('❌ Error al conectar a la base de datos:', err);
   });
-
-// const persona = {
-//   nombre: "Julian",
-//   edad: 30,
-//   correo: "julian@example.com"
-// };
-
-// // Función asincrónica que simula obtener datos con una promesa
-// async function obtenerPersona(): Promise<typeof persona> {
-//   return new Promise((resolve) => {
-//     setTimeout(() => {
-//       resolve(persona);
-//     }, 1000); // Simula 1 segundo de espera
-//   });
-// }
-
-// // Ruta /persona
-// app.get('/persona', async (req: Request, res: Response) => {
-//   const datos = await obtenerPersona();
-//   res.json(datos);
-// });

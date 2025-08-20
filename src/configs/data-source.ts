@@ -1,6 +1,6 @@
 export const personas = [
   {
-    id: 1, // No tiene que ver el id sino la posision index del arreglo
+    id: 1,
     nombre: "Julian",
     edad: 30,
     correo: "julian@example.com"

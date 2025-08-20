@@ -1,5 +1,5 @@
 import { Request, Response } from 'express';
-import { obtenerPersonas } from '../controllers/peopleController';
+import { crearPersona, deletePerson, editPerson, obtenerPersonaPorId, obtenerPersonas } from '../controllers/peopleController';
 import { personas } from '../configs/data-source';
 import { Router } from 'express';
 
@@ -10,11 +10,9 @@ router.get('/personas', async (req: Request, res: Response) => {
     res.json(datos);
 });
 
-router.get('/personas/:id', (req: Request, res: Response) => {
+router.get('/personas/:id', async (req: Request, res: Response) => {
   const id = parseInt(req.params.id);
-//   const persona = personas[id]; // para tomar el index del arreglo
-  const persona = personas.find(p => p.id === id);
-
+  const persona = await obtenerPersonaPorId;
   if (persona) {
     res.json(persona);
   } else {
@@ -22,59 +20,37 @@ router.get('/personas/:id', (req: Request, res: Response) => {
   }
 });
 
-router.post('/personas', (req: Request, res: Response) => {
+router.post('/personas', async (req: Request, res: Response) => {
   const nuevaPersona = req.body;
 
-  // Generar un nuevo ID automáticamente
-  const nuevoId = personas.length > 0 ? personas[personas.length - 1].id + 1 : 1;
-  const personaConId = { id: nuevoId, ...nuevaPersona };
-
-  personas.push(personaConId);
-
-  res.status(201).json(personaConId);
-});
-
-// PUT: Reemplazo completo de una persona
-router.put('/personas/:id', (req: Request, res: Response) => {
-  const id = parseInt(req.params.id);
-  const nuevaPersona = req.body;
-
-  const index = personas.findIndex(p => p.id === id); // index revisa long del arreglo
-
-  if (index === -1) {
-    return res.status(404).json({ mensaje: 'Persona no encontrada' });
+  try {
+    const personaCreada = await crearPersona(nuevaPersona);
+    res.status(201).json(personaCreada);
+  } catch (error) {
+    res.status(500).json({ error: 'Error al crear la persona' });
   }
-
-  // Reemplazar completamente la persona
-  personas[index] = { id, ...nuevaPersona };
-
-  res.json(personas[index]);
 });
 
-router.delete('/personas/:id', (req: Request, res: Response) => {
-    const id = parseInt(req.params.id);
-    
-    const index = personas.findIndex(p => p.id === id);
+router.put('/personas/:id', async (req: Request, res: Response) => {
+  const id = parseInt(req.params.id);
+  const editedPerson = req.body;
 
-    if (index === -1) {
-        return res.status(404).json({ mensaje: 'Persona no encontrada' });
-    }
+  try {
+    const personaEditada = await editPerson({ id, ...editedPerson });
+    res.json(personaEditada);
+  } catch (error) {
+    res.status(404).json({ mensaje: 'Persona no encontrada' });
+  }
+});
 
-    // Eliminar la persona del arreglo
-    const personaEliminada = personas.splice(index, 1)[0];
-
+router.delete('/personas/:id', async (req: Request, res: Response) => {
+  const id = parseInt(req.params.id);
+  try {
+    const personaEliminada = await deletePerson(id);
     res.json({ mensaje: 'Persona eliminada', persona: personaEliminada });
-    });
-
-  
-//   const persona = personas.find(p => p.id === id);
-
-//   if (persona) {
-//     const personaEliminada = personas.splice(persona.id, 1)[0];
-//     res.json({ mensaje: 'Persona eliminada', persona: personaEliminada });
-//   } else {
-//     res.status(404).json({ error: "Persona no encontrada" });
-//   }
-// });
+  } catch (error) {
+    res.status(404).json({ mensaje: 'Persona no encontrada' });
+  }
+});
 
 export const peopleRouter = router;

@@ -12,13 +12,18 @@ router.get('/personas', async (req: Request, res: Response) => {
 
 router.get('/personas/:id', async (req: Request, res: Response) => {
   const id = parseInt(req.params.id);
-  const persona = await obtenerPersonaPorId;
-  if (persona) {
-    res.json(persona);
-  } else {
-    res.status(404).json({ error: "Persona no encontrada" });
+  try {
+    const persona = await obtenerPersonaPorId(id);
+    if (persona) {
+      res.json(persona);
+    } else {
+      res.status(404).json({ mensaje: 'Persona no encontrada' });
+    }
+  } catch (error) {
+    res.status(500).json({ error: 'Error al consultar la base de datos' });
   }
 });
+
 
 router.post('/personas', async (req: Request, res: Response) => {
   const nuevaPersona = req.body;

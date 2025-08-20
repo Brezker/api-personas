@@ -1,7 +1,3 @@
-
-// Simulación de una "base de datos"
-// const persona = { cuando esta solo en el mismo archivo/ cuando no se tiene que exportar
-
 export const personas = [
   {
     id: 1, // No tiene que ver el id sino la posision index del arreglo

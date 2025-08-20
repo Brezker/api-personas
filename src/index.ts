@@ -6,7 +6,7 @@ import { Pool } from 'pg';
 
 const app = express();
 const PORT = 3000;
-const pool = new Pool({
+export const pool = new Pool({
   user: 'postgres',
   host: 'localhost',
   database: 'persona',

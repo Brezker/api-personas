@@ -1,10 +1,12 @@
-import express, { Request, Response } from 'express';
+import express from 'express';
 import rootRouter from './routers/rootRouter';
 import { Pool } from 'pg';
+import { setupSwagger } from './configs/swagger';
 import dotenv from 'dotenv';
 
 dotenv.config();
 const app = express();
+setupSwagger(app);
 const PORT = 3000;
 export const pool = new Pool({
   user: process.env.DB_USER,
@@ -20,6 +22,7 @@ app.use('/api', rootRouter);
 
 app.listen(PORT, () => {
   console.log(`🚀 Servidor corriendo en http://localhost:${PORT}`);
+  console.log(`📝 Documentación Swagger en http://localhost:${PORT}/api-docs`)
 });
 
 pool.connect()

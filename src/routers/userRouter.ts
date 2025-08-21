@@ -1,5 +1,6 @@
 import { Request, Response } from 'express';
-import { loginUser, getUsers, getUserById, createUser, 
+import { authenticateJWT } from '../middlewares/jwtMiddleware';
+import { loginUser, checkRole, getUsers, getUserById, createUser, 
   editUser, deleteUser, changeUserPassword } from '../controllers/userController';
 import { Router } from 'express';
 
@@ -38,16 +39,34 @@ router.get('/user/:id', async (req: Request, res: Response) => {
 });
 
 
-router.post('/user', async (req: Request, res: Response) => {
-  const newUser = req.body;
+// router.post('/user', async (req: Request, res: Response) => {
+//   const newUser = req.body;
 
-  try {
-    const createdUser = await createUser(newUser);
-    res.status(201).json(createdUser);
-  } catch (error) {
-    res.status(500).json({ error: 'Error creating user' });
+//   try {
+//     const createdUser = await createUser(newUser);
+//     res.status(201).json(createdUser);
+//   } catch (error) {
+//     res.status(500).json({ error: 'Error creating user' });
+//   }
+// });
+
+router.post(
+  '/user',
+  authenticateJWT,
+  checkRole(['admin']), // Solo admin puede crear usuarios
+  async (req, res) => {
+    try {
+      const newUser = await createUser(req.body);
+      res.status(201).json(newUser);
+    } catch (error) {
+      if (error instanceof Error) {
+        res.status(500).json({ message: error.message });
+      } else {
+        res.status(500).json({ message: 'Error desconocido' });
+      }
+    }
   }
-});
+);
 
 router.put('/user/:id', async (req: Request, res: Response) => {
   const id = parseInt(req.params.id);

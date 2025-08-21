@@ -1,3 +1,4 @@
+import { Request, Response, NextFunction } from 'express';
 import { pool } from '../index'
 import bcrypt from 'bcrypt';
 import jwt from 'jsonwebtoken';
@@ -36,6 +37,18 @@ export async function loginUser(email: string, password: string) {
   return { token, user: safeUser };
 }
 
+export function checkRole(allowedRoles: string[]) {
+  return (req: Request, res: Response, next: NextFunction) => {
+    const user = (req as any).user;
+
+    if (!user || !Array.isArray(user.role) || !user.role.some((r: string) => allowedRoles.includes(r))) {
+      return res.status(403).json({ message: 'Acceso denegado: rol no autorizado' });
+    }
+
+    next();
+  };
+}
+
 export async function getUsers() {
   const result = await pool.query('SELECT * FROM "user" ORDER BY id');
   return result.rows;
@@ -45,7 +58,6 @@ export async function getUserById(id: number) {
     const result = await pool.query('SELECT * FROM "user" WHERE id = $1', [id]);
     return result.rows[0] || null;
 }
-
 
 export async function createUser(newUser: {
   name_s: string;

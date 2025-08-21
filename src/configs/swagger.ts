@@ -10,8 +10,22 @@ const options: swaggerJSDoc.Options = {
       version: '1.0.0',
       description: 'Documentación de la API de Personas usando Swagger',
     },
+    components: {
+      securitySchemes: {
+        bearerAuth: {
+          type: 'http',
+          scheme: 'bearer',
+          bearerFormat: 'JWT',
+        },
+      },
+    },
+    security: [
+      {
+        bearerAuth: [],
+      },
+    ],
   },
-  apis: ['./src/routers/docs/*.ts'], // ajusta la ruta según donde estén tus rutas
+  apis: ['./src/routers/docs/*.ts', './src/controllers/*.ts'],
 };
 
 const swaggerSpec = swaggerJSDoc(options);

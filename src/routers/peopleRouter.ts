@@ -40,8 +40,8 @@ router.put('/personas/:id', async (req: Request, res: Response) => {
   const editedPerson = req.body;
 
   try {
-    const personaEditada = await editPerson({ id, ...editedPerson });
-    res.json(personaEditada);
+    const resultado = await editPerson({ id, ...editedPerson });
+    res.json(resultado);
   } catch (error) {
     res.status(404).json({ mensaje: 'Persona no encontrada' });
   }

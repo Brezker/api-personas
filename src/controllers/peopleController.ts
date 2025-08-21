@@ -20,13 +20,26 @@ export async function crearPersona(nuevaPersona:{nombre: string; edad: number; c
 }
 
 export async function editPerson(personToEdit: { id: number; nombre: string; edad: number; correo: string }) {
-    const { id, nombre, edad, correo } = personToEdit;
-    const result = await pool.query(
-        'UPDATE personas SET nombre=$2,edad=$3,correo=$4 WHERE id=$1 RETURNING *',
-        [id,nombre,edad,correo]
-    );
-    return result.rows[0];
+  const { id, nombre, edad, correo } = personToEdit;
+
+  // Obtener datos antes de la edición
+  const beforeResult = await pool.query('SELECT * FROM personas WHERE id = $1', [id]);
+  const personaAntes = beforeResult.rows[0];
+
+  if (!personaAntes) {
+    throw new Error('Persona no encontrada');
+  }
+
+  // Editar persona
+  const afterResult = await pool.query(
+    'UPDATE personas SET nombre=$2, edad=$3, correo=$4 WHERE id=$1 RETURNING *',
+    [id, nombre, edad, correo]
+  );
+  const personaDespues = afterResult.rows[0];
+
+  return { antes: personaAntes, despues: personaDespues };
 }
+
 
 export async function deletePerson(id: number) {
     const result = await pool.query(

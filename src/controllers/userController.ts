@@ -58,25 +58,30 @@ export async function getUserById(id: number) {
     return result.rows[0] || null;
 }
 
-export async function createUser(newUser: {
-  name_s: string;
-  last_name: string;
-  m_sur_name: string;
-  email: string;
-  password: string;
-  role: string[];
-}) {
+export async function createUser(
+  newUser: {
+    name_s: string;
+    last_name: string;
+    m_sur_name: string;
+    email: string;
+    password: string;
+    role: string[];
+  },
+  creator: { role:string[] }
+) {
   const { name_s, last_name, m_sur_name, email, password, role } = newUser;
-
   const allowedRoles = ['admin', 'agent', 'client'];
 
   if (!Array.isArray(role) || !role.every((r) => allowedRoles.includes(r))) {
     throw new Error('Invalid role');
   }
   
+  if (creator.role.includes('agent') && !role.every((r) => r === 'client')) {
+    throw new Error('Can not create this role type');
+  }
+
   const saltRounds = 10;
   const hashedPassword = await bcrypt.hash(password, saltRounds);
-
   const result = await pool.query(
     `INSERT INTO "user" (
       name_s,

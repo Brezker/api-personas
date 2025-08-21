@@ -53,17 +53,15 @@ router.get('/user/:id', async (req: Request, res: Response) => {
 router.post(
   '/user',
   authenticateJWT,
-  checkRole(['admin', 'agent']), // Solo admin puede crear usuarios
+  checkRole(['admin', 'agent']),
   async (req, res) => {
     try {
-      const newUser = await createUser(req.body);
-      res.status(201).json(newUser);
+      const creator = (req as any).user;
+      const newUser = req.body;
+      const createdUser = await createUser(newUser, creator);
+      res.status(201).json(createdUser);
     } catch (error) {
-      if (error instanceof Error) {
-        res.status(500).json({ message: error.message });
-      } else {
-        res.status(500).json({ message: 'Error desconocido' });
-      }
+      res.status(500).json({ message: error instanceof Error ? error.message : 'Error desconocido' });
     }
   }
 );

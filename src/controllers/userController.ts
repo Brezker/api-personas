@@ -5,19 +5,19 @@ import jwt from 'jsonwebtoken';
 
 export async function loginUser(email: string, password: string) {
   if (!email || !password) {
-    throw new Error('Email y contraseña son requeridos');
+    throw new Error('Email and password are required');
   }
 
   const result = await pool.query('SELECT * FROM "user" WHERE email = $1', [email]);
   const user = result.rows[0];
 
   if (!user) {
-    throw new Error('Credenciales inválidas');
+    throw new Error('Invalid credentials');
   }
 
   const passwordMatch = await bcrypt.compare(password, user.password);
   if (!passwordMatch) {
-    throw new Error('Credenciales inválidas');
+    throw new Error('Invalid credentials');
   }
 
   const jwtSecret = process.env.JWT_SECRET;

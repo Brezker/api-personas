@@ -169,6 +169,41 @@
 /**
  * @openapi
  * /api/user/user/{id}:
+ *   patch:
+ *     summary: Cambia la contraseña de un usuario
+ *     tags:
+ *       - Usuarios
+ *     parameters:
+ *       - name: id
+ *         in: path
+ *         required: true
+ *         schema:
+ *           type: integer
+ *         description: ID del usuario
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             required:
+ *               - password
+ *             properties:
+ *               password:
+ *                 type: string
+ *                 example: nuevaContraseñaSegura123
+ *     responses:
+ *       200:
+ *         description: Contraseña actualizada exitosamente
+ *       400:
+ *         description: La contraseña es requerida
+ *       404:
+ *         description: Usuario no encontrado
+ */
+
+/**
+ * @openapi
+ * /api/user/user/{id}:
  *   delete:
  *     summary: Elimina un usuario por ID
  *     tags:

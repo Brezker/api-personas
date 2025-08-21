@@ -61,6 +61,18 @@ export async function editUser(userToEdit: {
   return { before: userBefore, after: userAfter };
 }
 
+export async function changeUserPassword(id: number, newPassword: string) {
+  const userResult = await pool.query('SELECT * FROM "user" WHERE id = $1', [id]);
+  const user = userResult.rows[0];
+  if (!user) {
+    throw new Error('User not found');
+  }
+  const updateResult = await pool.query(
+    `UPDATE "user" SET "password" = $2 WHERE id = $1 RETURNING *`,
+    [id, newPassword]
+  );
+  return updateResult.rows[0];
+}
 
 export async function deleteUser(id: number) {
     const result = await pool.query(

@@ -1,5 +1,6 @@
 import { Request, Response } from 'express';
-import { getUsers, getUserById, createUser, editUser, deleteUser } from '../controllers/userController';
+import { getUsers, getUserById, createUser, 
+  editUser, deleteUser, changeUserPassword } from '../controllers/userController';
 import { Router } from 'express';
 
 const router = Router();
@@ -42,6 +43,20 @@ router.put('/user/:id', async (req: Request, res: Response) => {
   try {
     const result = await editUser({ id, ...editedUser });
     res.json(result);
+  } catch (error) {
+    res.status(404).json({ mensaje: 'User not found' });
+  }
+});
+
+router.patch('/user/:id', async (req: Request, res: Response) => {
+  const id = parseInt(req.params.id);
+  const { password } = req.body;
+  if (!password) {
+    return res.status(400).json({ mensaje: 'Password is required' });
+  }
+  try {
+    const updatedUser = await changeUserPassword(id, password);
+    res.json(updatedUser);
   } catch (error) {
     res.status(404).json({ mensaje: 'User not found' });
   }

@@ -1,4 +1,40 @@
 import { pool } from '../index'
+import bcrypt from 'bcrypt';
+import jwt from 'jsonwebtoken';
+
+export async function loginUser(email: string, password: string) {
+  if (!email || !password) {
+    throw new Error('Email y contraseña son requeridos');
+  }
+
+  const result = await pool.query('SELECT * FROM "user" WHERE email = $1', [email]);
+  const user = result.rows[0];
+
+  if (!user) {
+    throw new Error('Credenciales inválidas');
+  }
+
+  const passwordMatch = await bcrypt.compare(password, user.password);
+  if (!passwordMatch) {
+    throw new Error('Credenciales inválidas');
+  }
+
+  const jwtSecret = process.env.JWT_SECRET;
+  if (!jwtSecret) {
+    throw new Error('JWT_SECRET no está definida en el archivo .env');
+  }
+
+  const token = jwt.sign(
+    { id: user.id, email: user.email, role: user.role },
+    jwtSecret,
+    { expiresIn: '1h' }
+  );
+
+  // Evita retornar la contraseña
+  const { password: _, ...safeUser } = user;
+
+  return { token, user: safeUser };
+}
 
 export async function getUsers() {
   const result = await pool.query('SELECT * FROM "user" ORDER BY id');
@@ -10,30 +46,47 @@ export async function getUserById(id: number) {
     return result.rows[0] || null;
 }
 
-export async function createUser(newUser:{
-  name_s: string; last_name: string; m_sur_name: string;
-  email: string; password: string; role: string[] 
+
+export async function createUser(newUser: {
+  name_s: string;
+  last_name: string;
+  m_sur_name: string;
+  email: string;
+  password: string;
+  role: string[];
 }) {
-    const { name_s, last_name, m_sur_name, email, password, role } = newUser;
-    const result = await pool.query(
-        `INSERT INTO "user" (
-          name_s,
-          last_name,
-          m_sur_name,
-          email,
-          "password",
-          "role"
-        ) VALUES (
-          $1, $2, $3, $4, $5, $6
-        ) RETURNING *`,
-        [name_s, last_name, m_sur_name, email, password, role]
-    );
-    return result.rows[0];
+  const { name_s, last_name, m_sur_name, email, password, role } = newUser;
+
+  const saltRounds = 10;
+  const hashedPassword = await bcrypt.hash(password, saltRounds);
+
+  const result = await pool.query(
+    `INSERT INTO "user" (
+      name_s,
+      last_name,
+      m_sur_name,
+      email,
+      "password",
+      "role"
+    ) VALUES (
+      $1, $2, $3, $4, $5, $6
+    ) RETURNING *`,
+    [name_s, last_name, m_sur_name, email, hashedPassword, role]
+  );
+
+  const { password: _, ...safeUser } = result.rows[0];
+
+  return safeUser;
 }
 
-export async function editUser(userToEdit: { 
-  id: number; name_s: string; last_name: string; m_sur_name: string;
-  email: string; password: string; role: string[] 
+export async function editUser(userToEdit: {
+  id: number;
+  name_s: string;
+  last_name: string;
+  m_sur_name: string;
+  email: string;
+  password: string;
+  role: string[];
 }) {
   const { id, name_s, last_name, m_sur_name, email, password, role } = userToEdit;
 
@@ -44,6 +97,9 @@ export async function editUser(userToEdit: {
     throw new Error('User not found');
   }
   
+  const saltRounds = 10;
+  const hashedPassword = await bcrypt.hash(password, saltRounds);
+
   const afterResult = await pool.query(
     `UPDATE "user" SET
       name_s = $2,
@@ -54,25 +110,35 @@ export async function editUser(userToEdit: {
       "role" = $7
     WHERE id = $1
     RETURNING *`,
-    [id, name_s, last_name, m_sur_name, email, password, role]
+    [id, name_s, last_name, m_sur_name, email, hashedPassword, role]
   );
-  const userAfter = afterResult.rows[0];
 
-  return { before: userBefore, after: userAfter };
+  const { password: _, ...userAfter } = afterResult.rows[0];
+  const { password: __, ...userBeforeSafe } = userBefore;
+
+  return { before: userBeforeSafe, after: userAfter };
 }
 
 export async function changeUserPassword(id: number, newPassword: string) {
   const userResult = await pool.query('SELECT * FROM "user" WHERE id = $1', [id]);
   const user = userResult.rows[0];
+
   if (!user) {
     throw new Error('User not found');
   }
+
+  const saltRounds = 10;
+  const hashedPassword = await bcrypt.hash(newPassword, saltRounds);
+
   const updateResult = await pool.query(
     `UPDATE "user" SET "password" = $2 WHERE id = $1 RETURNING *`,
-    [id, newPassword]
+    [id, hashedPassword]
   );
-  return updateResult.rows[0];
+
+  const { password: _, ...safeUser } = updateResult.rows[0];
+  return safeUser;
 }
+
 
 export async function deleteUser(id: number) {
     const result = await pool.query(

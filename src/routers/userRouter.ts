@@ -1,9 +1,22 @@
 import { Request, Response } from 'express';
-import { getUsers, getUserById, createUser, 
+import { loginUser, getUsers, getUserById, createUser, 
   editUser, deleteUser, changeUserPassword } from '../controllers/userController';
 import { Router } from 'express';
 
 const router = Router();
+
+router.post('/login', async (req: Request, res: Response) => {
+  const { email, password } = req.body;
+  if (!email || !password) {
+    return res.status(400).json({ mensaje: 'Email and password are required' });
+  }
+  try {
+    const { token, user } = await loginUser(email, password);
+    res.json({ token, user });
+  } catch (error) {
+    res.status(401).json({ mensaje: 'Invalid credentials' });
+  }
+});
 
 router.get('/user', async (req: Request, res: Response) => {
     const data = await getUsers();

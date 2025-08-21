@@ -1,5 +1,57 @@
 /**
  * @openapi
+ * /api/user/login:
+ *   post:
+ *     summary: Inicia sesión con email y contraseña
+ *     tags:
+ *       - Usuarios
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             required:
+ *               - email
+ *               - password
+ *             properties:
+ *               email:
+ *                 type: string
+ *                 format: email
+ *                 example: julian@example.com
+ *               password:
+ *                 type: string
+ *                 example: contraseñaSegura123
+ *     responses:
+ *       200:
+ *         description: Inicio de sesión exitoso
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 token:
+ *                   type: string
+ *                   example: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...
+ *                 user:
+ *                   type: object
+ *                   properties:
+ *                     id:
+ *                       type: integer
+ *                     email:
+ *                       type: string
+ *                     role:
+ *                       type: array
+ *                       items:
+ *                         type: string
+ *       400:
+ *         description: Email y contraseña son requeridos
+ *       401:
+ *         description: Credenciales inválidas
+ */
+
+/**
+ * @openapi
  * /api/user/user:
  *   get:
  *     summary: Obtiene todos los usuarios

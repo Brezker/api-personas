@@ -53,7 +53,7 @@ router.get('/user/:id', async (req: Request, res: Response) => {
 router.post(
   '/user',
   authenticateJWT,
-  checkRole(['admin']), // Solo admin puede crear usuarios
+  checkRole(['admin', 'agent']), // Solo admin puede crear usuarios
   async (req, res) => {
     try {
       const newUser = await createUser(req.body);

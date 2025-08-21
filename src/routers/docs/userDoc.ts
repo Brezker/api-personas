@@ -148,6 +148,7 @@
  *                 type: array
  *                 items:
  *                   type: string
+ *                   enum: [admin, agent, client]
  *                 example: ["admin"]
  *     responses:
  *       201:

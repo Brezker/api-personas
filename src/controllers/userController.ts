@@ -31,7 +31,6 @@ export async function loginUser(email: string, password: string) {
     { expiresIn: '1h' }
   );
 
-  // Evita retornar la contraseña
   const { password: _, ...safeUser } = user;
 
   return { token, user: safeUser };
@@ -42,7 +41,7 @@ export function checkRole(allowedRoles: string[]) {
     const user = (req as any).user;
 
     if (!user || !Array.isArray(user.role) || !user.role.some((r: string) => allowedRoles.includes(r))) {
-      return res.status(403).json({ message: 'Acceso denegado: rol no autorizado' });
+      return res.status(403).json({ message: 'Denied access: unauthorized role' });
     }
 
     next();
@@ -69,6 +68,12 @@ export async function createUser(newUser: {
 }) {
   const { name_s, last_name, m_sur_name, email, password, role } = newUser;
 
+  const allowedRoles = ['admin', 'agent', 'client'];
+
+  if (!Array.isArray(role) || !role.every((r) => allowedRoles.includes(r))) {
+    throw new Error('Invalid role');
+  }
+  
   const saltRounds = 10;
   const hashedPassword = await bcrypt.hash(password, saltRounds);
 

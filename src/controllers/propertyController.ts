@@ -10,13 +10,112 @@ export async function getPropertyById(id: number) {
     return result.rows[0] || null;
 }
 
-export async function createProperty(nuevaPersona:{nombre: string; edad: number; correo: string }) {
-    const { nombre, edad, correo } = nuevaPersona;
-    const result = await pool.query(
-        'INSERT INTO property (nombre,edad,correo) VALUES ($1,$2,$3) RETURNING *',
-        [nombre,edad,correo]
-    );
-    return result.rows[0];
+export async function createProperty(newProperty:{
+  title: string;
+  description?: string;
+  transaction_type: 'rent' | 'sale';
+  status: 'available' | 'unavailable';
+  currency: string;
+  sale_price: string;
+  rent_price: string;
+  deposit: string;
+  commission_rate: string;
+  province: string;
+  sector: string;
+  latitude: string;
+  longitude: string;
+  has_parking: boolean;
+  parking_spaces?: number;
+  is_furnished: boolean;
+  video_url?: string;
+  virtual_tour_url?: string;
+  agent_id: number;
+  broker_id: number;
+  created_by: number;
+  property_type: string;
+  updated_at?: string;
+  } ) {
+  const { 
+    title,
+    description,
+    transaction_type,
+    status,
+    currency,
+    sale_price,
+    rent_price,
+    deposit,
+    commission_rate,
+    province,
+    sector,
+    latitude,
+    longitude,
+    has_parking,
+    parking_spaces,
+    is_furnished,
+    video_url,
+    virtual_tour_url,
+    agent_id,
+    broker_id,
+    created_by,
+    property_type,
+    updated_at,
+  } = newProperty;
+  const result = await pool.query(
+      `INSERT INTO property (
+        title,
+        description,
+        transaction_type,
+        status,
+        currency,
+        sale_price,
+        rent_price,
+        deposit,
+        commission_rate,
+        province,
+        sector,
+        latitude,
+        longitude,
+        has_parking,
+        parking_spaces,
+        is_furnished,
+        video_url,
+        virtual_tour_url,
+        agent_id,
+        broker_id,
+        created_by,
+        property_type,
+        created_at,
+        updated_at
+      ) VALUES (
+        $1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16, $17, $18, $19, $20, $21, $22, NOW(), NOW()
+      ) RETURNING *;`,
+      [
+        title,
+        description,
+        transaction_type,
+        status,
+        currency,
+        sale_price,
+        rent_price,
+        deposit,
+        commission_rate,
+        province,
+        sector,
+        latitude,
+        longitude,
+        has_parking,
+        parking_spaces,
+        is_furnished,
+        video_url,
+        virtual_tour_url,
+        agent_id,
+        broker_id,
+        created_by,
+        property_type,
+        updated_at,
+      ]
+  );
+  return result.rows[0];
 }
 
 export async function editProperty(personToEdit: { id: number; nombre: string; edad: number; correo: string }) {

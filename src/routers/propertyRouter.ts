@@ -1,7 +1,6 @@
-import { Request, Response } from 'express';
+import { Request, Response, Router } from 'express';
 import { crearPersona, deletePerson, editPerson, obtenerPersonaPorId } from '../controllers/peopleController';
-import { Router } from 'express';
-import { getProperties } from '../controllers/propertyController';
+import { getProperties, getPropertyById } from '../controllers/propertyController';
 
 const router = Router();
 
@@ -13,14 +12,14 @@ router.get('/property', async (req: Request, res: Response) => {
 router.get('/property/:id', async (req: Request, res: Response) => {
   const id = parseInt(req.params.id);
   try {
-    const persona = await obtenerPersonaPorId(id);
+    const persona = await getPropertyById(id);
     if (persona) {
       res.json(persona);
     } else {
-      res.status(404).json({ mensaje: 'Persona no encontrada' });
+      res.status(404).json({ mensaje: 'Property not found' });
     }
   } catch (error) {
-    res.status(500).json({ error: 'Error al consultar la base de datos' });
+    res.status(500).json({ error: 'Error quering data' });
   }
 });
 

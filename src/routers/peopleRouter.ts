@@ -30,8 +30,18 @@ router.post('/personas', async (req: Request, res: Response) => {
   try {
     const personaCreada = await crearPersona(nuevaPersona);
     res.status(201).json(personaCreada);
-  } catch (error) {
-    res.status(500).json({ error: 'Error al crear la persona' });
+  } catch (error: any) {
+    if (error.detalles) {
+      res.status(400).json({
+        error: error.mensaje,
+        detalles: error.detalles
+      });
+    } else {
+      res.status(500).json({
+        error: 'Error interno al crear la persona',
+        detalles: error.message || error
+      });
+    }
   }
 });
 
@@ -42,8 +52,18 @@ router.put('/personas/:id', async (req: Request, res: Response) => {
   try {
     const resultado = await editPerson({ id, ...editedPerson });
     res.json(resultado);
-  } catch (error) {
-    res.status(404).json({ mensaje: 'Persona no encontrada' });
+  } catch (error: any) {
+    if (error.detalles) {
+      res.status(400).json({
+        error: error.mensaje,
+        detalles: error.detalles
+      });
+    } else {
+      res.status(500).json({
+        error: 'Error interno al editar la persona',
+        detalles: error.message || error
+      });
+    }
   }
 });
 

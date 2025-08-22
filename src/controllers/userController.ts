@@ -2,6 +2,9 @@ import { Request, Response, NextFunction } from 'express';
 import { pool } from '../index'
 import bcrypt from 'bcrypt';
 import jwt from 'jsonwebtoken';
+import { plainToInstance } from 'class-transformer';
+import { validate } from 'class-validator';
+import { createUserDTO } from '../dtos/userDTOs';
 
 export async function loginUser(email: string, password: string) {
   if (!email || !password) {
@@ -59,18 +62,24 @@ export async function getUserById(id: number) {
 }
 
 export async function createUser(
-  newUser: {
-    name_s: string;
-    last_name: string;
-    m_sur_name: string;
-    email: string;
-    password: string;
-    role: string[];
-  },
+  newUser: createUserDTO,
   creator: { role:string[] }
 ) {
-  const { name_s, last_name, m_sur_name, email, password, role } = newUser;
+  const dto = plainToInstance(createUserDTO, newUser);
+  const errors = await validate(dto);
   const allowedRoles = ['admin', 'agent', 'client'];
+  const { name_s, last_name, m_sur_name, email, password, role } = dto;
+
+  if (errors.length > 0) {
+    const details = errors.map(err => ({
+      field: err.property,
+      errors: err.constraints
+    }));
+    throw {
+      mensaje: 'Invalid data',
+      details
+    };
+  }
 
   if (!Array.isArray(role) || !role.every((r) => allowedRoles.includes(r))) {
     throw new Error('Invalid role');
@@ -163,9 +172,12 @@ export async function changeUserPassword(id: number, newPassword: string) {
 
 
 export async function deleteUser(id: number) {
-    const result = await pool.query(
-        'DELETE FROM "user" WHERE id=$1 RETURNING *', [id]
-    );
-    return result.rows[0];
+  const result = await pool.query(
+      'DELETE FROM "user" WHERE id=$1 RETURNING *', [id]
+  );
+  if (result.rowCount === 0) {
+    throw new Error(`User not found with id ${id}`);
+  }
+  return result.rows[0];
 }
 

@@ -38,18 +38,6 @@ router.get('/user/:id', async (req: Request, res: Response) => {
   }
 });
 
-
-// router.post('/user', async (req: Request, res: Response) => {
-//   const newUser = req.body;
-
-//   try {
-//     const createdUser = await createUser(newUser);
-//     res.status(201).json(createdUser);
-//   } catch (error) {
-//     res.status(500).json({ error: 'Error creating user' });
-//   }
-// });
-
 router.post(
   '/user',
   authenticateJWT,
@@ -60,8 +48,18 @@ router.post(
       const newUser = req.body;
       const createdUser = await createUser(newUser, creator);
       res.status(201).json(createdUser);
-    } catch (error) {
-      res.status(500).json({ message: error instanceof Error ? error.message : 'Error desconocido' });
+    } catch (error:any) {
+      if (error.details) {
+        res.status(400).json({
+          error: error.mensaje,
+          details: error.details
+        });
+      } else {
+        res.status(500).json({ 
+          message: error instanceof Error ? error.message : 'Internal error creating user',
+          details: error.message || error 
+        });
+      }
     }
   }
 );

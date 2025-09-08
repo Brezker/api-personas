@@ -27,11 +27,9 @@ export async function crearPersona(nuevaPersona:CrearPersonaDto) {
       detalles
     };
   }
-
-  const { nombre, edad, correo } = dto;
   const result = await pool.query(
       'INSERT INTO personas (nombre,edad,correo) VALUES ($1,$2,$3) RETURNING *',
-      [nombre,edad,correo]
+      [dto.nombre,dto.edad,dto.correo]
   );
   return result.rows[0];
 }
@@ -39,8 +37,7 @@ export async function crearPersona(nuevaPersona:CrearPersonaDto) {
 export async function editPerson(personToEdit: editPersonDto) {
   const dto = plainToInstance(editPersonDto, personToEdit);
   const errors = await validate(dto);
-  const { id, nombre, edad, correo } = dto;
-  const beforeResult = await pool.query('SELECT * FROM personas WHERE id = $1', [id]);
+  const beforeResult = await pool.query('SELECT * FROM personas WHERE id = $1', [dto.id]);
   const personaAntes = beforeResult.rows[0];
 
   if (errors.length > 0) {
@@ -60,7 +57,7 @@ export async function editPerson(personToEdit: editPersonDto) {
 
   const afterResult = await pool.query(
     'UPDATE personas SET nombre=$2, edad=$3, correo=$4 WHERE id=$1 RETURNING *',
-    [id, nombre, edad, correo]
+    [dto.id, dto.nombre, dto.edad, dto.correo]
   );
   const personaDespues = afterResult.rows[0];
 

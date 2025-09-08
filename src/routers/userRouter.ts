@@ -51,7 +51,7 @@ router.post(
     } catch (error:any) {
       if (error.details) {
         res.status(400).json({
-          error: error.mensaje,
+          error: error.message,
           details: error.details
         });
       } else {

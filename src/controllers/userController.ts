@@ -4,7 +4,7 @@ import bcrypt from 'bcrypt';
 import jwt from 'jsonwebtoken';
 import { plainToInstance } from 'class-transformer';
 import { validate } from 'class-validator';
-import { createUserDTO } from '../dtos/userDTOs';
+import { createUserDTO, editUserDto } from '../dtos/userDTOs';
 
 export async function loginUser(email: string, password: string) {
   if (!email || !password) {
@@ -76,7 +76,7 @@ export async function createUser(
       errors: err.constraints
     }));
     throw {
-      mensaje: 'Invalid data',
+      message: 'Invalid data',
       details
     };
   }
@@ -110,16 +110,21 @@ export async function createUser(
   return safeUser;
 }
 
-export async function editUser(userToEdit: {
-  id: number;
-  name_s: string;
-  last_name: string;
-  m_sur_name: string;
-  email: string;
-  password: string;
-  role: string[];
-}) {
-  const { id, name_s, last_name, m_sur_name, email, password, role } = userToEdit;
+export async function editUser(userToEdit: editUserDto) {
+  const dto = plainToInstance(editUserDto, userToEdit);
+  const errors = await validate(dto);
+  const { id, name_s, last_name, m_sur_name, email, password, role } = dto;
+
+  if (errors.length > 0) {
+    const details = errors.map(err => ({
+      field: err.property,
+      errors: err.constraints
+    }));
+    throw {
+      message: 'Invalid data',
+      details
+    };
+  }
 
   const beforeResult = await pool.query('SELECT * FROM "user" WHERE id = $1', [id]);
   const userBefore = beforeResult.rows[0];

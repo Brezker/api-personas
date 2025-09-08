@@ -1,6 +1,5 @@
 import { Request, Response, Router } from 'express';
-import { crearPersona, deletePerson, editPerson, obtenerPersonaPorId } from '../controllers/peopleController';
-import { getProperties, getPropertyById } from '../controllers/propertyController';
+import { createProperty, getProperties, getPropertyById, editProperty, deleteProperty } from '../controllers/propertyController';
 
 const router = Router();
 
@@ -25,35 +24,35 @@ router.get('/property/:id', async (req: Request, res: Response) => {
 
 
 router.post('/property', async (req: Request, res: Response) => {
-  const nuevaPersona = req.body;
-
+  const newProperty = req.body;
   try {
-    const personaCreada = await crearPersona(nuevaPersona);
-    res.status(201).json(personaCreada);
+    const createdProperty = await createProperty(newProperty);
+    res.status(201).json(createdProperty);
   } catch (error) {
-    res.status(500).json({ error: 'Error al crear la persona' });
+    res.status(500).json({ error: 'Error creating property' });
+    console.log(error);
   }
 });
 
 router.put('/property/:id', async (req: Request, res: Response) => {
   const id = parseInt(req.params.id);
-  const editedPerson = req.body;
+  const editedProperty = req.body;
 
   try {
-    const resultado = await editPerson({ id, ...editedPerson });
-    res.json(resultado);
+    const result = await editProperty({ id, ...editedProperty });
+    res.json(result);
   } catch (error) {
-    res.status(404).json({ mensaje: 'Persona no encontrada' });
+    res.status(404).json({ mensaje: 'Propiedad no encontrada' });
   }
 });
 
 router.delete('/property/:id', async (req: Request, res: Response) => {
   const id = parseInt(req.params.id);
   try {
-    const personaEliminada = await deletePerson(id);
-    res.json({ mensaje: 'Persona eliminada', persona: personaEliminada });
+    const deletedProperty = await deleteProperty(id);
+    res.json({ mensaje: 'Propiedad eliminada', persona: deletedProperty });
   } catch (error) {
-    res.status(404).json({ mensaje: 'Persona no encontrada' });
+    res.status(404).json({ mensaje: 'Propiedad no encontrada' });
   }
 });
 

@@ -168,13 +168,73 @@
  *               title:
  *                 type: string
  *                 example: Updated Apartment Title
- *               rent_price:
+ *               description:
  *                 type: string
- *                 example: "1300.00"
+ *                 example: Updated description of the apartment.
+ *               transaction_type:
+ *                 type: string
+ *                 enum: [rent, sale]
+ *                 example: sale
  *               status:
  *                 type: string
  *                 enum: [available, unavailable]
  *                 example: unavailable
+ *               currency:
+ *                 type: string
+ *                 example: MXN
+ *               sale_price:
+ *                 type: string
+ *                 example: "1500000.00"
+ *               rent_price:
+ *                 type: string
+ *                 example: "1300.00"
+ *               deposit:
+ *                 type: string
+ *                 example: "1300.00"
+ *               commission_rate:
+ *                 type: string
+ *                 example: "6.00"
+ *               province:
+ *                 type: string
+ *                 example: Nuevo León
+ *               sector:
+ *                 type: string
+ *                 example: San Pedro
+ *               latitude:
+ *                 type: string
+ *                 example: "25.686614"
+ *               longitude:
+ *                 type: string
+ *                 example: "-100.316113"
+ *               has_parking:
+ *                 type: boolean
+ *                 example: false
+ *               parking_spaces:
+ *                 type: integer
+ *                 example: 0
+ *               is_furnished:
+ *                 type: boolean
+ *                 example: false
+ *               video_url:
+ *                 type: string
+ *                 format: uri
+ *                 example: https://example.com/new-video.mp4
+ *               virtual_tour_url:
+ *                 type: string
+ *                 format: uri
+ *                 example: https://example.com/new-virtual-tour
+ *               agent_id:
+ *                 type: integer
+ *                 example: 2
+ *               broker_id:
+ *                 type: integer
+ *                 example: 2
+ *               created_by:
+ *                 type: integer
+ *                 example: 1
+ *               property_type:
+ *                 type: string
+ *                 example: house
  *     responses:
  *       200:
  *         description: Propiedad modificada exitosamente

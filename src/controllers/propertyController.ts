@@ -112,29 +112,62 @@ export async function createProperty(newProperty:{
         broker_id,
         created_by,
         property_type,
-        updated_at,
+        // updated_at,
       ]
   );
   return result.rows[0];
 }
 
-export async function editProperty(personToEdit: { id: number; nombre: string; edad: number; correo: string }) {
-  const { id, nombre, edad, correo } = personToEdit;
+export async function editProperty(updatedProperty: {
+  id: number;
+  title?: string;
+  description?: string;
+  transaction_type?: 'rent' | 'sale';
+  status?: 'available' | 'unavailable';
+  currency?: string;
+  sale_price?: string;
+  rent_price?: string;
+  deposit?: string;
+  commission_rate?: string;
+  province?: string;
+  sector?: string;
+  latitude?: string;
+  longitude?: string;
+  has_parking?: boolean;
+  parking_spaces?: number;
+  is_furnished?: boolean;
+  video_url?: string;
+  virtual_tour_url?: string;
+  agent_id?: number;
+  broker_id?: number;
+  created_by?: number;
+  property_type?: string;
+  // updated_at?: string;
+}) {
+  const { id, ...fieldsToUpdate } = updatedProperty;
 
   const beforeResult = await pool.query('SELECT * FROM property WHERE id = $1', [id]);
-  const personaAntes = beforeResult.rows[0];
+  const propertyBefore = beforeResult.rows[0];
 
-  if (!personaAntes) {
-    throw new Error('Persona no encontrada');
+  if (!propertyBefore) {
+    throw new Error('Property not found');
   }
-  
-  const afterResult = await pool.query(
-    'UPDATE property SET nombre=$2, edad=$3, correo=$4 WHERE id=$1 RETURNING *',
-    [id, nombre, edad, correo]
-  );
-  const personaDespues = afterResult.rows[0];
 
-  return { antes: personaAntes, despues: personaDespues };
+  const keys = Object.keys(fieldsToUpdate);
+  const values = Object.values(fieldsToUpdate);
+
+  if (keys.length === 0) {
+    throw new Error('No se proporcionaron campos para actualizar');
+  }
+
+  const setClause = keys.map((key, index) => `${key} = $${index + 2}`).join(', ');
+
+  const query = `UPDATE property SET ${setClause}, updated_at = NOW() WHERE id = $1 RETURNING *`;
+
+  const result = await pool.query(query, [id, ...values]);
+  const propertyAfter = result.rows[0];
+
+  return { antes: propertyBefore, despues: propertyAfter };
 }
 
 export async function deleteProperty(id: number) {

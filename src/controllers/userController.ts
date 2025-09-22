@@ -25,7 +25,7 @@ export async function loginUser(email: string, password: string) {
 
   const jwtSecret = process.env.JWT_SECRET;
   if (!jwtSecret) {
-    throw new Error('JWT_SECRET no está definida en el archivo .env');
+    throw new Error('JWT_SECRET is not defined on the .env file');
   }
 
   const token = jwt.sign(
@@ -68,7 +68,6 @@ export async function createUser(
   const dto = plainToInstance(createUserDTO, newUser);
   const errors = await validate(dto);
   const allowedRoles = ['admin', 'agent', 'client'];
-  const { name_s, last_name, m_sur_name, email, password, role } = dto;
 
   if (errors.length > 0) {
     const details = errors.map(err => ({
@@ -81,16 +80,16 @@ export async function createUser(
     };
   }
 
-  if (!Array.isArray(role) || !role.every((r) => allowedRoles.includes(r))) {
+  if (!Array.isArray(dto.role) || !dto.role.every((r) => allowedRoles.includes(r))) {
     throw new Error('Invalid role');
   }
   
-  if (creator.role.includes('agent') && !role.every((r) => r === 'client')) {
+  if (creator.role.includes('agent') && !dto.role.every((r) => r === 'client')) {
     throw new Error('Can not create this role type');
   }
 
   const saltRounds = 10;
-  const hashedPassword = await bcrypt.hash(password, saltRounds);
+  const hashedPassword = await bcrypt.hash(dto.password, saltRounds);
   const result = await pool.query(
     `INSERT INTO "user" (
       name_s,
@@ -102,7 +101,7 @@ export async function createUser(
     ) VALUES (
       $1, $2, $3, $4, $5, $6
     ) RETURNING *`,
-    [name_s, last_name, m_sur_name, email, hashedPassword, role]
+    [dto.name_s, dto.last_name, dto.m_sur_name, dto.email, hashedPassword, dto.role]
   );
 
   const { password: _, ...safeUser } = result.rows[0];

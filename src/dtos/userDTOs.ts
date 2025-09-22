@@ -21,27 +21,8 @@ export class createUserDTO {
   role!: string[];
 }
 
-export class editUserDto {
+export class editUserDto extends createUserDTO {
   @IsInt()
   @Min(1)
   id!: number;
-
-  @IsString()
-  name_s!: string;
-
-  @IsString()
-  last_name!: string;
-
-  @IsString()
-  m_sur_name!: string;
-  
-  @IsEmail()
-  email!: string;
-
-  @IsString()
-  password!: string;
-
-  @IsArray()
-  @IsString({ each: true })
-  role!: string[];
 }

@@ -42,7 +42,7 @@ router.put('/property/:id', async (req: Request, res: Response) => {
     const result = await editProperty({ id, ...editedProperty });
     res.json(result);
   } catch (error) {
-    res.status(404).json({ mensaje: 'Propiedad no encontrada' });
+    res.status(404).json({ mensaje: 'Property not found' });
   }
 });
 
@@ -50,9 +50,9 @@ router.delete('/property/:id', async (req: Request, res: Response) => {
   const id = parseInt(req.params.id);
   try {
     const deletedProperty = await deleteProperty(id);
-    res.json({ mensaje: 'Propiedad eliminada', persona: deletedProperty });
+    res.json({ mensaje: 'Property deleted', persona: deletedProperty });
   } catch (error) {
-    res.status(404).json({ mensaje: 'Propiedad no encontrada' });
+    res.status(404).json({ mensaje: 'Property not found' });
   }
 });
 

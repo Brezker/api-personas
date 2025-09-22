@@ -88,16 +88,16 @@
  *                 example: USD
  *               sale_price:
  *                 type: string
- *                 example: "0.00"
+ *                 example: 0.00
  *               rent_price:
  *                 type: string
- *                 example: "1200.00"
+ *                 example: 1200.00
  *               deposit:
  *                 type: string
- *                 example: "1200.00"
+ *                 example: 1200.00
  *               commission_rate:
  *                 type: string
- *                 example: "5.00"
+ *                 example: 5.00
  *               province:
  *                 type: string
  *                 example: California
@@ -106,10 +106,10 @@
  *                 example: Downtown
  *               latitude:
  *                 type: string
- *                 example: "34.052235"
+ *                 example: 34.052235
  *               longitude:
  *                 type: string
- *                 example: "-118.243683"
+ *                 example: -118.243683
  *               has_parking:
  *                 type: boolean
  *                 example: true
@@ -184,16 +184,16 @@
  *                 example: MXN
  *               sale_price:
  *                 type: string
- *                 example: "1500000.00"
+ *                 example: 1500000.00
  *               rent_price:
  *                 type: string
- *                 example: "1300.00"
+ *                 example: 1300.00
  *               deposit:
  *                 type: string
- *                 example: "1300.00"
+ *                 example: 1300.00
  *               commission_rate:
  *                 type: string
- *                 example: "6.00"
+ *                 example: 6.00
  *               province:
  *                 type: string
  *                 example: Nuevo León
@@ -202,10 +202,10 @@
  *                 example: San Pedro
  *               latitude:
  *                 type: string
- *                 example: "25.686614"
+ *                 example: 25.686614
  *               longitude:
  *                 type: string
- *                 example: "-100.316113"
+ *                 example: -100.316113
  *               has_parking:
  *                 type: boolean
  *                 example: false

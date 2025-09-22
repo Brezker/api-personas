@@ -21,14 +21,14 @@ app.use(express.json());
 app.use('/api', rootRouter);
 
 app.listen(PORT, () => {
-  console.log(`🚀 Servidor corriendo en http://localhost:${PORT}`);
+  console.log(`🚀 Server running on http://localhost:${PORT}`);
   console.log(`📝 Documentación Swagger en http://localhost:${PORT}/api-docs`)
 });
 
 pool.connect()
   .then(() => {
-    console.log('✅ Conectado a la base de datos PostgreSQL');
+    console.log('✅ Connected to PostgreSQL DataBase');
   })
   .catch((err) => {
-    console.error('❌ Error al conectar a la base de datos:', err);
+    console.error('❌ Error al connecting to DataBase:', err);
   });

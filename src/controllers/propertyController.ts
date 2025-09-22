@@ -1,4 +1,7 @@
 import { pool } from '../index'
+import { plainToInstance } from 'class-transformer';
+import { validate } from 'class-validator';
+import { createPropertyDto, editPropertyDto } from '../dtos/propertyDTOs';
 
 export async function getProperties() {
   const result = await pool.query('SELECT * FROM property ORDER BY id');
@@ -10,57 +13,22 @@ export async function getPropertyById(id: number) {
     return result.rows[0] || null;
 }
 
-export async function createProperty(newProperty:{
-  title: string;
-  description?: string;
-  transaction_type: 'rent' | 'sale';
-  status: 'available' | 'unavailable';
-  currency: string;
-  sale_price: string;
-  rent_price: string;
-  deposit: string;
-  commission_rate: string;
-  province: string;
-  sector: string;
-  latitude: string;
-  longitude: string;
-  has_parking: boolean;
-  parking_spaces?: number;
-  is_furnished: boolean;
-  video_url?: string;
-  virtual_tour_url?: string;
-  agent_id: number;
-  broker_id: number;
-  created_by: number;
-  property_type: string;
-  updated_at?: string;
-  } ) {
-  const { 
-    title,
-    description,
-    transaction_type,
-    status,
-    currency,
-    sale_price,
-    rent_price,
-    deposit,
-    commission_rate,
-    province,
-    sector,
-    latitude,
-    longitude,
-    has_parking,
-    parking_spaces,
-    is_furnished,
-    video_url,
-    virtual_tour_url,
-    agent_id,
-    broker_id,
-    created_by,
-    property_type,
-    updated_at,
-  } = newProperty;
-  const result = await pool.query(
+export async function createProperty(
+  newProperty: createPropertyDto
+) {
+    const dto= plainToInstance(createPropertyDto, newProperty);
+    const errors = await validate(dto);
+    if (errors.length > 0) {
+      const details = errors.map(err => ({
+        field: err.property,
+        errors: err.constraints
+      }));
+      throw {
+        message: 'Invalid data',
+        details
+      };
+    }
+    const result = await pool.query(
       `INSERT INTO property (
         title,
         description,
@@ -90,60 +58,37 @@ export async function createProperty(newProperty:{
         $1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16, $17, $18, $19, $20, $21, $22, NOW(), NOW()
       ) RETURNING *;`,
       [
-        title,
-        description,
-        transaction_type,
-        status,
-        currency,
-        sale_price,
-        rent_price,
-        deposit,
-        commission_rate,
-        province,
-        sector,
-        latitude,
-        longitude,
-        has_parking,
-        parking_spaces,
-        is_furnished,
-        video_url,
-        virtual_tour_url,
-        agent_id,
-        broker_id,
-        created_by,
-        property_type,
+        dto.title,
+        dto.description,
+        dto.transaction_type,
+        dto.status,
+        dto.currency,
+        dto.sale_price,
+        dto.rent_price,
+        dto.deposit,
+        dto.commission_rate,
+        dto.province,
+        dto.sector,
+        dto.latitude,
+        dto.longitude,
+        dto.has_parking,
+        dto.parking_spaces,
+        dto.is_furnished,
+        dto.video_url,
+        dto.virtual_tour_url,
+        dto.agent_id,
+        dto.broker_id,
+        dto.created_by,
+        dto.property_type,
         // updated_at,
       ]
   );
   return result.rows[0];
 }
 
-export async function editProperty(updatedProperty: {
-  id: number;
-  title?: string;
-  description?: string;
-  transaction_type?: 'rent' | 'sale';
-  status?: 'available' | 'unavailable';
-  currency?: string;
-  sale_price?: string;
-  rent_price?: string;
-  deposit?: string;
-  commission_rate?: string;
-  province?: string;
-  sector?: string;
-  latitude?: string;
-  longitude?: string;
-  has_parking?: boolean;
-  parking_spaces?: number;
-  is_furnished?: boolean;
-  video_url?: string;
-  virtual_tour_url?: string;
-  agent_id?: number;
-  broker_id?: number;
-  created_by?: number;
-  property_type?: string;
-  // updated_at?: string;
-}) {
+export async function editProperty(
+  updatedProperty: editPropertyDto
+) {
   const { id, ...fieldsToUpdate } = updatedProperty;
 
   const beforeResult = await pool.query('SELECT * FROM property WHERE id = $1', [id]);
@@ -157,7 +102,7 @@ export async function editProperty(updatedProperty: {
   const values = Object.values(fieldsToUpdate);
 
   if (keys.length === 0) {
-    throw new Error('No se proporcionaron campos para actualizar');
+    throw new Error('Update properties where not provided');
   }
 
   const setClause = keys.map((key, index) => `${key} = $${index + 2}`).join(', ');

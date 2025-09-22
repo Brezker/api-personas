@@ -10,7 +10,7 @@ import {
   Max,
 } from 'class-validator';
 
-export class CreatePropertyDto {
+export class createPropertyDto {
   @IsString()
   title!: string;
 
@@ -84,7 +84,7 @@ export class CreatePropertyDto {
   property_type!: string;
 }
 
-export class EditPropertyDto extends CreatePropertyDto {
+export class editPropertyDto extends createPropertyDto {
   @IsInt()
   @Min(1)
   id!: number;

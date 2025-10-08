@@ -9,13 +9,13 @@ const router = Router();
 router.post('/login', async (req: Request, res: Response) => {
   const { email, password } = req.body;
   if (!email || !password) {
-    return res.status(400).json({ mensaje: 'Email and password are required' });
+    return res.status(400).json({ message: 'Email and password are required' });
   }
   try {
     const { token, user } = await loginUser(email, password);
     res.json({ token, user });
   } catch (error) {
-    res.status(401).json({ mensaje: 'Invalid credentials' });
+    res.status(401).json({ message: 'Invalid credentials' });
   }
 });
 
@@ -31,7 +31,7 @@ router.get('/user/:id', async (req: Request, res: Response) => {
     if (user) {
       res.json(user);
     } else {
-      res.status(404).json({ mensaje: 'User not found' });
+      res.status(404).json({ message: 'User not found' });
     }
   } catch (error) {
     res.status(500).json({ error: 'Error from database' });
@@ -72,7 +72,7 @@ router.put('/user/:id', async (req: Request, res: Response) => {
     const result = await editUser({ id, ...editedUser });
     res.json(result);
   } catch (error) {
-    res.status(404).json({ mensaje: 'User not found' });
+    res.status(404).json({ message: 'User not found' });
   }
 });
 
@@ -80,13 +80,13 @@ router.patch('/user/:id', async (req: Request, res: Response) => {
   const id = parseInt(req.params.id);
   const { password } = req.body;
   if (!password) {
-    return res.status(400).json({ mensaje: 'Password is required' });
+    return res.status(400).json({ message: 'Password is required' });
   }
   try {
     const updatedUser = await changeUserPassword(id, password);
     res.json(updatedUser);
   } catch (error) {
-    res.status(404).json({ mensaje: 'User not found' });
+    res.status(404).json({ message: 'User not found' });
   }
 });
 
@@ -94,9 +94,9 @@ router.delete('/user/:id', async (req: Request, res: Response) => {
   const id = parseInt(req.params.id);
   try {
     const deletedUser = await deleteUser(id);
-    res.json({ mensaje: 'User deleted', persona: deletedUser });
+    res.json({ message: 'User deleted', persona: deletedUser });
   } catch (error) {
-    res.status(404).json({ mensaje: 'User not found' });
+    res.status(404).json({ message: 'User not found' });
   }
 });
 

@@ -4,18 +4,18 @@ import { createProperty, getProperties, getPropertyById, editProperty, deletePro
 const router = Router();
 
 router.get('/property', async (req: Request, res: Response) => {
-    const datos = await getProperties();
-    res.json(datos);
+    const data = await getProperties();
+    res.json(data);
 });
 
 router.get('/property/:id', async (req: Request, res: Response) => {
   const id = parseInt(req.params.id);
   try {
-    const persona = await getPropertyById(id);
-    if (persona) {
-      res.json(persona);
+    const property = await getPropertyById(id);
+    if (property) {
+      res.json(property);
     } else {
-      res.status(404).json({ mensaje: 'Property not found' });
+      res.status(404).json({ message: 'Property not found' });
     }
   } catch (error) {
     res.status(500).json({ error: 'Error quering data' });
@@ -42,7 +42,7 @@ router.put('/property/:id', async (req: Request, res: Response) => {
     const result = await editProperty({ id, ...editedProperty });
     res.json(result);
   } catch (error) {
-    res.status(404).json({ mensaje: 'Property not found' });
+    res.status(404).json({ message: 'Property not found' });
   }
 });
 
@@ -50,9 +50,9 @@ router.delete('/property/:id', async (req: Request, res: Response) => {
   const id = parseInt(req.params.id);
   try {
     const deletedProperty = await deleteProperty(id);
-    res.json({ mensaje: 'Property deleted', persona: deletedProperty });
+    res.json({ message: 'Property deleted', persona: deletedProperty });
   } catch (error) {
-    res.status(404).json({ mensaje: 'Property not found' });
+    res.status(404).json({ message: 'Property not found' });
   }
 });
 
